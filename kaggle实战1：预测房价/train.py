@@ -4,7 +4,6 @@ import torch.nn as nn
 from model import Model
 from d2l import torch as d2l
 
-
 """
 训练一个神经网络需要准备的组件：
 1. 实例化的模型
@@ -43,7 +42,6 @@ def log_rmse(net, loss, features, labels):
     return rmse
 
 
-
 def train(net, train_features, train_labels, test_features, test_labels):
     train_loss, test_loss = [], []
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
@@ -61,9 +59,9 @@ def train(net, train_features, train_labels, test_features, test_labels):
             l = loss(y_hat, y)
             # 反向传播
             optim.step()
-        
+
         train_loss.append(log_rmse(net, loss, train_features, train_labels))
-        if  test_labels is not None:
+        if test_labels is not None:
             test_loss.append(log_rmse(net, loss, test_features, test_labels))
 
     return train_loss, test_loss
@@ -77,29 +75,28 @@ def k_fold(net, X_train, y_train):
         train_l_sum += train_loss[-1]
         valid_l_sum += valid_loss[-1]
         if i == 0:
-            d2l.plot(list(range(1, epochs + 1)), [train_loss, valid_loss], 
-                    xlabel='epoch', ylabel='rmse', xlim=[1, epochs],
-                    legend=['train', 'valid'], yscale='log')
+            d2l.plot(list(range(1, epochs + 1)), [train_loss, valid_loss],
+                     xlabel='epoch', ylabel='rmse', xlim=[1, epochs],
+                     legend=['train', 'valid'], yscale='log')
         print(f'折{i + 1}，训练log rmse{float(train_loss[-1]):f}, '
-                f'验证log rmse{float(valid_loss[-1]):f}')
-        
+              f'验证log rmse{float(valid_loss[-1]):f}')
+
     return train_l_sum / k, valid_l_sum / k
 
 
 if __name__ == "__main__":
-	net = Model()
+    net = Model()
 
-	# 准备数据集
-	train_data = pd.read_csv("data/processed_train.csv")
-	test_data = pd.read_csv("data/processed_test.csv")
+    # 准备数据集
+    train_data = pd.read_csv("data/processed_train.csv")
+    test_data = pd.read_csv("data/processed_test.csv")
 
-	train_features = torch.tensor(train_data.iloc[:, :-1].values, dtype=torch.float32)
-	train_labels = torch.tensor(train_data.iloc[:, -1].values, dtype=torch.float32)
-	test_features = torch.tensor(test_data.values, dtype=torch.float32)
+    train_features = torch.tensor(train_data.iloc[:, :-1].values, dtype=torch.float32)
+    train_labels = torch.tensor(train_data.iloc[:, -1].values, dtype=torch.float32)
+    test_features = torch.tensor(test_data.values, dtype=torch.float32)
 
-	print(f'标签是{train_labels}')
+    print(f'标签是{train_labels}')
 
-	train_l, valid_l = k_fold(net, train_features, train_labels)
-	print(f'{k}-折验证: 平均训练log rmse: {float(train_l):f}, '
-		f'平均验证log rmse: {float(valid_l):f}')
-
+    train_l, valid_l = k_fold(net, train_features, train_labels)
+    print(f'{k}-折验证: 平均训练log rmse: {float(train_l):f}, '
+          f'平均验证log rmse: {float(valid_l):f}')
