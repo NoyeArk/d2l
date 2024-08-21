@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="root@connect.cqa1.seetacloud.com:37030 password" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="zql@202.117.43.23:22">
     <serverData>
-      <paths name="autodl">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="root@connect.cqa1.seetacloud.com:37030 password">
         <serverdata>
           <mappings>
@@ -19,7 +12,7 @@
       <paths name="zql@202.117.43.23:22">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/code" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
