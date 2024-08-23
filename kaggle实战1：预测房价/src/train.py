@@ -15,10 +15,11 @@ from torch.utils.tensorboard import SummaryWriter
 """
 
 """训练超参数定义"""
-k = 10
+k = 5
 lr = 0.03
-epochs = 30
-batch_size = 32
+epochs = 60
+batch_size = 64
+num_gpu = 4
 
 
 def get_k_fold_data(k, i, X, y):
@@ -69,7 +70,9 @@ def train(net, train_features, train_labels, test_features, test_labels) -> (lis
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
 
     loss = nn.MSELoss()
-    optim = torch.optim.SGD(net.parameters(), lr=lr)
+    optim = torch.optim.Adam(net.parameters(), lr=lr)
+
+    writer = SummaryWriter(log_dir='../runs')
 
     for epoch in tqdm(range(epochs), colour='blue'):
         for X, y in train_iter:
@@ -84,10 +87,13 @@ def train(net, train_features, train_labels, test_features, test_labels) -> (lis
             # 反向传播
             optim.step()
 
-        train_loss.append(log_mse(net, loss, train_features, train_labels))
+        _loss = log_mse(net, loss, train_features, train_labels)
+        writer.add_scalar(tag="loss", scalar_value=_loss, global_step=epoch)
+        train_loss.append(_loss)
         if test_labels is not None:
             test_loss.append(log_mse(net, loss, test_features, test_labels))
 
+    writer.close()
     return train_loss, test_loss
 
 
@@ -114,11 +120,14 @@ def k_fold(net, X_train, y_train):
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    writer = SummaryWriter(log_dir='./tensorboard')
+
+    devices = [d2l.try_gpu(i) for i in range(num_gpu)]
+    print(f'devices:{devices}')
 
     # 实例化模型
     net = Model()
-    net = net.to(device)
+    # net = nn.DataParallel(net, device_ids=devices)
+    net = net.to("cuda")
 
     # writer.add_graph(net, torch.randn(2, 18).to(device))
     # writer.close()
@@ -133,9 +142,9 @@ if __name__ == "__main__":
     train_labels = torch.tensor(train_data.iloc[:, -1].values, dtype=torch.float32)
     test_features = torch.tensor(test_data.values, dtype=torch.float32)
 
-    train_features = train_features.to(device)
-    train_labels = train_labels.to(device)
-    test_features = test_features.to(device)
+    train_features = train_features.to("cuda")
+    train_labels = train_labels.to("cuda")
+    test_features = test_features.to("cuda")
 
     print(f'标签是{train_labels}')
 
