@@ -15,15 +15,15 @@ from torch.utils.tensorboard import SummaryWriter
 """
 
 """训练超参数定义"""
-k = 5
-lr = 0.03
+k = 8
+lr = 0.003
 epochs = 60
-batch_size = 64
-num_gpu = 4
+batch_size = 128
+num_gpu = 1
 
 
 def get_k_fold_data(k, i, X, y):
-    assert k > 1
+    assert k >= 1
     fold_size = X.shape[0] // k
     X_train, y_train = None, None
     for j in range(k):
@@ -48,7 +48,7 @@ def log_mse(net, loss, features, labels):
     return rmse
 
 
-def train(net, train_features, train_labels, test_features, test_labels) -> (list, list):
+def train(net, writer, train_features, train_labels, test_features, test_labels) -> (list, list):
     """
     使用传入的数据对net进行epochs轮训练.
 
@@ -72,8 +72,6 @@ def train(net, train_features, train_labels, test_features, test_labels) -> (lis
     loss = nn.MSELoss()
     optim = torch.optim.Adam(net.parameters(), lr=lr)
 
-    writer = SummaryWriter(log_dir='../runs')
-
     for epoch in tqdm(range(epochs), colour='blue'):
         for X, y in train_iter:
             # 清除上次计算的梯度，准备新一轮的计算
@@ -88,30 +86,32 @@ def train(net, train_features, train_labels, test_features, test_labels) -> (lis
             optim.step()
 
         _loss = log_mse(net, loss, train_features, train_labels)
-        writer.add_scalar(tag="loss", scalar_value=_loss, global_step=epoch)
+        writer[0].add_scalar(tag="train_loss", scalar_value=_loss, global_step=epoch)
         train_loss.append(_loss)
         if test_labels is not None:
+            writer[1].add_scalar(tag="test_loss", scalar_value=_loss, global_step=epoch)
             test_loss.append(log_mse(net, loss, test_features, test_labels))
 
-    writer.close()
+    writer[0].close()
+    writer[1].close()
     return train_loss, test_loss
 
 
 def k_fold(net, X_train, y_train):
     # 训练集和验证集的损失
     train_l_sum, valid_l_sum = 0, 0
+
+    # 多少折就需要多少个writer
+    writers = {'train': [SummaryWriter(log_dir=f'../runs/train/kfold_{i}') for i in range(k)],
+               'test': [SummaryWriter(log_dir=f'../runs/test/kfold_{i}') for i in range(k)]}
+
     for i in range(k):
         # 得到一折的数据
         data = get_k_fold_data(k, i, X_train, y_train)
         # 对这些数据进行训练
-        train_loss, valid_loss = train(net, *data)
+        train_loss, valid_loss = train(net, [writers['train'][i], writers['test'][i]], *data)
         train_l_sum += train_loss[-1]
         valid_l_sum += valid_loss[-1]
-
-        # 可视化
-        # if i == 0:
-        #     d2l.plot(list(range(1, epochs + 1)), [train_loss, valid_loss], xlabel='epoch', ylabel='rmse',
-        #              xlim=[1, epochs], legend=['train', 'valid'], yscale='log')
 
         print(f'折{i + 1}，训练log mse{float(train_loss[-1]):f}, 'f'验证log mse{float(valid_loss[-1]):f}')
 
@@ -160,4 +160,4 @@ if __name__ == "__main__":
     submission.to_csv('submission.csv', index=False)
 
     # 保存模型
-    torch.save(net, "../model/model5.pth")
+    torch.save(net, "../model/model7.pth")
