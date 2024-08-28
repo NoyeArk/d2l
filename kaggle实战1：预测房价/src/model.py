@@ -6,9 +6,7 @@ class Model(nn.Module):
 		super(Model, self).__init__()
 		self.net = nn.Sequential(
 			nn.Linear(dim, 32),
-			nn.Linear(32, 16),
-			nn.Linear(16, 8),
-			nn.Linear(8, 1)
+			nn.Linear(32, 1)
 		)
 
 	def forward(self, x):

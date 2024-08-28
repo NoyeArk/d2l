@@ -15,10 +15,10 @@ from torch.utils.tensorboard import SummaryWriter
 """
 
 """训练超参数定义"""
-k = 8
-lr = 0.003
-epochs = 60
-batch_size = 128
+k = 3
+lr = 0.05
+epochs = 30
+batch_size = 16
 num_gpu = 1
 
 
@@ -118,38 +118,11 @@ def k_fold(net, X_train, y_train):
     return train_l_sum / k, valid_l_sum / k
 
 
-if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    devices = [d2l.try_gpu(i) for i in range(num_gpu)]
-    print(f'devices:{devices}')
-
-    # 实例化模型
-    net = Model()
-    # net = nn.DataParallel(net, device_ids=devices)
-    net = net.to("cuda")
-
-    # writer.add_graph(net, torch.randn(2, 18).to(device))
-    # writer.close()
-
-    # 读取数据集
-    train_data = pd.read_csv("../data/processed_train.csv")
+def pred_and_save_model(net, model_name):
     test_data = pd.read_csv("../data/processed_test.csv")
     row_test_data = pd.read_csv("../data/test.csv")
-
-    # 将数据由pandas转为tensor
-    train_features = torch.tensor(train_data.iloc[:, :-1].values, dtype=torch.float32)
-    train_labels = torch.tensor(train_data.iloc[:, -1].values, dtype=torch.float32)
     test_features = torch.tensor(test_data.values, dtype=torch.float32)
-
-    train_features = train_features.to("cuda")
-    train_labels = train_labels.to("cuda")
     test_features = test_features.to("cuda")
-
-    print(f'标签是{train_labels}')
-
-    train_l, valid_l = k_fold(net, train_features, train_labels)
-    print(f'{k}-折验证: 平均训练log mse: {float(train_l):f}, 'f'平均验证log mse: {float(valid_l):f}')
 
     # 对测试集进行预测
     net.eval()
@@ -160,4 +133,27 @@ if __name__ == "__main__":
     submission.to_csv('submission.csv', index=False)
 
     # 保存模型
-    torch.save(net, "../model/model7.pth")
+    torch.save(net, f"../model/{model_name}.pth")
+
+
+if __name__ == "__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # 实例化模型
+    net = Model()
+    net = net.to(device)
+
+    # 读取数据集
+    train_data = pd.read_csv("../data/processed_train.csv")
+
+    # 将数据由pandas转为tensor
+    train_features = torch.tensor(train_data.iloc[:, :-1].values, dtype=torch.float32)
+    train_labels = torch.tensor(train_data.iloc[:, -1].values, dtype=torch.float32)
+
+    train_features = train_features.to("cuda")
+    train_labels = train_labels.to("cuda")
+
+    train_l, valid_l = k_fold(net, train_features, train_labels)
+    print(f'{k}-折验证: 平均训练log mse: {float(train_l):f}, 'f'平均验证log mse: {float(valid_l):f}')
+
+    pred_and_save_model(net, "model7")
