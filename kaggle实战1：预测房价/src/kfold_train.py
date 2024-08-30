@@ -15,10 +15,28 @@ from torch.utils.tensorboard import SummaryWriter
 """
 
 """训练超参数定义"""
-lr = 0.003
-epochs = 30
+k = 5
+lr = 5
+epochs = 100
 batch_size = 64
 num_gpu = 1
+
+
+def get_k_fold_data(k, i, X, y):
+    assert k >= 1
+    fold_size = X.shape[0] // k
+    X_train, y_train = None, None
+    for j in range(k):
+        idx = slice(j * fold_size, (j + 1) * fold_size)
+        X_part, y_part = X[idx, :], y[idx]
+        if j == i:
+            X_valid, y_valid = X_part, y_part
+        elif X_train is None:
+            X_train, y_train = X_part, y_part
+        else:
+            X_train = torch.cat([X_train, X_part], 0)
+            y_train = torch.cat([y_train, y_part], 0)
+    return X_train, y_train, X_valid, y_valid
 
 
 def log_mse(net, loss, features, labels):
@@ -30,7 +48,7 @@ def log_mse(net, loss, features, labels):
     return rmse
 
 
-def train(net, train_features, train_labels, test_features, test_labels) -> (list, list):
+def train(net, writer, train_features, train_labels, test_features, test_labels) -> (list, list):
     """
     使用传入的数据对net进行epochs轮训练.
 
@@ -48,7 +66,7 @@ def train(net, train_features, train_labels, test_features, test_labels) -> (lis
     """
     net.train()
 
-    train_loss, test_loss = [], []
+    train_loss, valid_loss = [], []
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
 
     loss = nn.MSELoss()
@@ -70,13 +88,15 @@ def train(net, train_features, train_labels, test_features, test_labels) -> (lis
         _loss = log_mse(net, loss, train_features, train_labels)
         writer[0].add_scalar(tag="train_loss", scalar_value=_loss, global_step=epoch)
         train_loss.append(_loss)
+
         if test_labels is not None:
+            _loss = log_mse(net, loss, test_features, test_labels)
             writer[1].add_scalar(tag="valid_loss", scalar_value=_loss, global_step=epoch)
-            test_loss.append(log_mse(net, loss, test_features, test_labels))
+            valid_loss.append(_loss)
 
     writer[0].close()
     writer[1].close()
-    return train_loss, test_loss
+    return train_loss, valid_loss
 
 
 def k_fold(net, X_train, y_train):
@@ -135,9 +155,7 @@ if __name__ == "__main__":
     train_features = train_features.to("cuda:0")
     train_labels = train_labels.to("cuda:0")
 
-    train_x, train_y, valid_x, valid_y = spli
-
-    train_l, valid_l = train(net, train_features, train_labels)
-    print(f'训练log mse: {float(train_l):f}, 'f'验证log mse: {float(valid_l):f}')
+    train_l, valid_l = k_fold(net, train_features, train_labels)
+    print(f'{k}-折验证: 平均训练log mse: {float(train_l):f}, 'f'平均验证log mse: {float(valid_l):f}')
 
     pred_and_save_model(net, "model7")
