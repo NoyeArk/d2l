@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d1fd9d7f-359c-4ead-98fa-576e71d1f6d2" name="autodl">
+        <fileTransfer rootFolder="/root/autodl-tmp" accessType="SFTP" host="connect.cqa1.seetacloud.com" port="37030" sshConfigId="04103183-c841-4db2-8962-6d462e05e267" sshConfig="root@connect.cqa1.seetacloud.com:37030 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

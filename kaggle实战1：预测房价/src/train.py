@@ -137,7 +137,8 @@ def pred_and_save_model(net, model_name):
 
 
 if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print('device:', device)
 
     # 实例化模型
     net = Model()
@@ -150,8 +151,8 @@ if __name__ == "__main__":
     train_features = torch.tensor(train_data.iloc[:, :-1].values, dtype=torch.float32)
     train_labels = torch.tensor(train_data.iloc[:, -1].values, dtype=torch.float32)
 
-    train_features = train_features.to("cuda")
-    train_labels = train_labels.to("cuda")
+    train_features = train_features.to("cuda:0")
+    train_labels = train_labels.to("cuda:0")
 
     train_l, valid_l = k_fold(net, train_features, train_labels)
     print(f'{k}-折验证: 平均训练log mse: {float(train_l):f}, 'f'平均验证log mse: {float(valid_l):f}')
