@@ -9,6 +9,9 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="0b6dae8e-5a97-4d8e-a759-3d8dd2a6940b" name="zql@172.16.14.79:22 password">
+        <fileTransfer rootFolder="/home/zql" accessType="SFTP" host="172.16.14.79" port="22" sshConfigId="c3672787-b5bf-467b-93e7-427d0032ed7a" sshConfig="zql@172.16.14.79:22 password" />
+      </webServer>
     </option>
   </component>
 </project>

@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always">
+  <component name="PublishConfigData" autoUpload="Always" serverName="zql@172.16.14.79:22 password">
     <serverData>
       <paths name="autodl">
         <serverdata>
           <mappings>
             <mapping deploy="/code" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="zql@172.16.14.79:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/d2l" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
