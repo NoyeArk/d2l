@@ -2,13 +2,6 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="d1fd9d7f-359c-4ead-98fa-576e71d1f6d2" name="autodl">
-        <fileTransfer rootFolder="/root/autodl-tmp" accessType="SFTP" host="connect.cqa1.seetacloud.com" port="37030" sshConfigId="04103183-c841-4db2-8962-6d462e05e267" sshConfig="root@connect.cqa1.seetacloud.com:37030 password">
-          <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
-          </advancedOptions>
-        </fileTransfer>
-      </webServer>
       <webServer id="0b6dae8e-5a97-4d8e-a759-3d8dd2a6940b" name="zql@172.16.14.79:22 password">
         <fileTransfer rootFolder="/home/zql" accessType="SFTP" host="172.16.14.79" port="22" sshConfigId="c3672787-b5bf-467b-93e7-427d0032ed7a" sshConfig="zql@172.16.14.79:22 password" />
       </webServer>
