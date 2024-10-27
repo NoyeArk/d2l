@@ -1,1 +1,21 @@
-https://www.kaggle.com/code/oriharaizayayo/d2l-chapter-30
+# Kaggle实战2：树叶分类
+
+## 1 比赛介绍
+
+竞赛地址：https://www.kaggle.com/competitions/classify-leaves/overview
+
+竞赛任务是预测叶子图像的类别。该数据集包含 176 个类别、18353 张训练图像和 8800 张测试图像。每个类别至少有50张图片用于训练。
+测试集平均分为公开和私有排行榜。
+
+
+
+## 2 打怪升级记录
+
+| 序号 |           epochs           |             学习率              | 优化器  |   网络架构   |            d_model            | 模型大小 |                分数                |
+|:--:|:--------------------------:|:----------------------------:|:----:|:--------:|:-----------------------------:|:----:|:--------------------------------:|
+| 1  |             50             |            0.0001            | Adam | resnet18 |             [64]              | 8KB  |             0.98432              |
+| 2  |             30             | <font color=Blue>0.03</font> | Adam |  2层全连接   |             [64]              | 8KB  |  <font color=Red>0.98693</font>  |
+| 3  |             30             |            0.003             | Adam |  2层全连接   | <font color=Blue>[128]</font> | 13KB |  <font color=Red>0.99144</font>  |
+| 4  |             30             |            0.003             | Adam |  2层全连接   |             [32]              | 6KB  | <font color=Green>0.98361</font> |
+| 5  |             50             |            0.003             | Adam |  2层全连接   |             [32]              | 6KB  |             0.99559              |
+| 6  | <font color=Blue>30</font> |            0.003             | Adam |  2层全连接   |             [32]              | 6KB  | <font color=Green>0.87767</font> |

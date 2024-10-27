@@ -31,6 +31,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\kaggle2-Classify_Leaves\data\sample_submission.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\kaggle2-Classify_Leaves\data\train.csv">
           <value>
             <Attribute>
